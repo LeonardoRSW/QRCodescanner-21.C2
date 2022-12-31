@@ -3,7 +3,9 @@ package com.example.qrcodescanner_21c2;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -44,7 +46,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //jika qr code tidak ada sama sekali
             if (result.getContents() == null) {
                 Toast.makeText(this, "Hasil Scanning tidak  ada ", Toast.LENGTH_LONG).show();
-            } else {
+            }else if(result.getContents().contains("tel:")){
+                //Mendapat data kode telpon
+                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(result.getContents()));
+                startActivity(intent);
+
+            } else if (Patterns.WEB_URL.matcher(result.getContents()).matches()) {
+                Intent visitUrl = new Intent(Intent.ACTION_VIEW, Uri.parse(result.getContents()));
+                startActivity(visitUrl);
                 try {
                     JSONObject obj = new JSONObject(result.getContents());
                     textViewname.setText(obj.getString("nama"));
@@ -57,8 +66,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }else{
             super.onActivityResult(requestcode, resultcode, data);
+        }
     }
-}
     @Override
     public void onClick(View v) {
         qrScan.initiateScan();
